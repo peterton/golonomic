@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"time"
 
-	"github.com/ev3go/ev3dev"
+    "github.com/ev3go/ev3dev"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -16,12 +17,6 @@ const (
 )
 
 var inverse = mat.NewDense(3, 3, nil)
-
-type Motor struct {
-	device   *ev3dev.TachoMotor
-	maxSpeed int
-}
-var motor map[string]*Motor
 
 func setupInverse() {
 	data := []float64{
@@ -36,53 +31,37 @@ func setupInverse() {
 	}
 
 	fn := mat.Formatted(inverse, mat.Prefix("    "), mat.Squeeze())
-	fmt.Printf("n = %v", fn)
+	fmt.Printf("i = %v", fn)
 }
 
-func setupMotors() {
-	var err error
+func testMotors() {
+	outA, err := ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-l-motor")
+	if err != nil {
+		log.Fatalf("failed to find medium motor on outA: %v", err)
+	}
+	err = outA.SetStopAction("brake").Err()
+	if err != nil {
+		log.Fatalf("failed to set brake stop for medium motor on outA: %v", err)
+	}
+	maxMedium := outA.MaxSpeed()
 
-	motor["A"].device, err = ev3dev.TachoMotorFor("outA", "lego-ev3-l-motor")
-	if err != nil {
-		log.Fatalf("failed to find large motor on port A: %v", err)
-	}
-	motor["B"].device, err = ev3dev.TachoMotorFor("outB", "lego-ev3-l-motor")
-	if err != nil {
-		log.Fatalf("failed to find large motor on port B: %v", err)
-	}
-	motor["C"].device, err = ev3dev.TachoMotorFor("outC", "lego-ev3-l-motor")
-	if err != nil {
-		log.Fatalf("failed to find large motor on port C: %v", err)
-	}
-
-	err = motor["A"].device.SetStopAction("brake").Err()
-	if err != nil {
-		log.Fatalf("failed to set brake stop for large motor on port A: %v", err)
-	}
-	err = motor["B"].device.SetStopAction("brake").Err()
-	if err != nil {
-		log.Fatalf("failed to set brake stop for large motor on port B: %v", err)
-	}
-	err = motor["C"].device.SetStopAction("brake").Err()
-	if err != nil {
-		log.Fatalf("failed to set brake stop for large motor on port C: %v", err)
-	}
-
-	motor["A"].maxSpeed = motor["A"].device.MaxSpeed()
-	motor["B"].maxSpeed = motor["B"].device.MaxSpeed()
-	motor["C"].maxSpeed = motor["C"].device.MaxSpeed()
+	outA.SetSpeedSetpoint(50 * maxMedium / 100).Command("run-forever")
+	time.Sleep(time.Second / 2)
+	outA.Command("stop")
 }
 
 func move(x, y, z float64) {
 	direction := mat.NewDense(1, 3, []float64{x, y, z})
 	force := mat.NewDense(1, 3, nil)
 	force.Mul(direction, inverse)
-	fmt.Print(force, "\n")
+
+	fn := mat.Formatted(force, mat.Prefix("    "), mat.Squeeze())
+	fmt.Printf("force = %v", fn)
 }
 
 func main() {
 	setupInverse()
-	setupMotors()
-	
+	testMotors()
+
 	move(0, 1, 0)	
 }
