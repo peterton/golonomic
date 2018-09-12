@@ -76,8 +76,8 @@ func move(x, y, z float64) {
 
 	// just a test
 	motorA.SetSpeedSetpoint(int(force.At(0, 0) * float64(motorA.MaxSpeed()))).Command("run-forever")
-	motorA.SetSpeedSetpoint(int(force.At(0, 1) * float64(motorB.MaxSpeed()))).Command("run-forever")
-	motorA.SetSpeedSetpoint(int(force.At(0, 2) * float64(motorC.MaxSpeed()))).Command("run-forever")
+	motorB.SetSpeedSetpoint(int(force.At(0, 1) * float64(motorB.MaxSpeed()))).Command("run-forever")
+	motorC.SetSpeedSetpoint(int(force.At(0, 2) * float64(motorC.MaxSpeed()))).Command("run-forever")
 	time.Sleep(time.Second / 2)
 	motorA.Command("stop")
 	motorB.Command("stop")
