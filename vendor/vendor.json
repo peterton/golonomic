@@ -1,0 +1,91 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "CciCJsQl9j/tmKmlDjtvnDv/Q6U=",
+			"path": "github.com/ev3go/ev3dev",
+			"revision": "fabc942293dfef39b550cfa9b9849c3ccbabc807",
+			"revisionTime": "2018-09-09T11:36:49Z"
+		},
+		{
+			"checksumSHA1": "rpVGMdgqNVY3sYQZg2RPtiwPzsY=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "d0be0721c37eeb5299f245a996a483160fc36940",
+			"revisionTime": "2018-09-09T03:34:56Z"
+		},
+		{
+			"checksumSHA1": "Y0gxmu9OGGiI4DMlBaJ/jUrg6sI=",
+			"path": "gonum.org/v1/gonum/blas",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "qVAiKlM7vV3zVTSFChyKOIByvBU=",
+			"path": "gonum.org/v1/gonum/blas/blas64",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "1czSDHKN/VuBJ8vmxt7SuSluoU0=",
+			"path": "gonum.org/v1/gonum/blas/gonum",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "xhOKXEK5l++S0ZM5wlywGPI2oeA=",
+			"path": "gonum.org/v1/gonum/floats",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "lPWQlDrWo6iRLemDPCR5kEdavnw=",
+			"path": "gonum.org/v1/gonum/internal/asm/c128",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "5s2AY9p+pN9uu/Bj89CSsKvVxfM=",
+			"path": "gonum.org/v1/gonum/internal/asm/f32",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "wIndajSHEh6npNhpjKakeUuaM1o=",
+			"path": "gonum.org/v1/gonum/internal/asm/f64",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "Gi7cwcjEebMyJBhYaFo96GQUDjc=",
+			"path": "gonum.org/v1/gonum/internal/math32",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "E6B5CZTPB+wHrkZOqOZgJBTds2U=",
+			"path": "gonum.org/v1/gonum/lapack",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "bM4FdJDwXWk/3hhj7sN9ywbfb1k=",
+			"path": "gonum.org/v1/gonum/lapack/gonum",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "CgP+S7oQdEAz9DEoJnDX6wGIepE=",
+			"path": "gonum.org/v1/gonum/lapack/lapack64",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		},
+		{
+			"checksumSHA1": "AnqlmS0mgF99+i+4Sig2X0AqV2w=",
+			"path": "gonum.org/v1/gonum/mat",
+			"revision": "a809dafcb141e2414a6cf04a680ff84e72d45c69",
+			"revisionTime": "2018-09-01T23:26:58Z"
+		}
+	],
+	"rootPath": "github.com/peterton/golonomic"
+}
