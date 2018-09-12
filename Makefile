@@ -19,3 +19,4 @@ run: build
 	ssh $(EV3_HOST) ./$(BINARY_NAME)
 deps:
 	$(GOGET) github.com/ev3go/ev3dev
+	$(GOGET) gonum.org/v1/gonum/mat
