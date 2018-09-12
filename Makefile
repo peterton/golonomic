@@ -15,8 +15,8 @@ clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 run: build
-	scp $(BINARY_NAME) $(EV3_HOST):
-	ssh $(EV3_HOST) ./$(BINARY_NAME)
+	scp $(BINARY_NAME) robot@$(EV3_HOST):
+	ssh robot@$(EV3_HOST) ./$(BINARY_NAME)
 deps:
 	$(GOGET) github.com/ev3go/ev3dev
 	$(GOGET) gonum.org/v1/gonum/mat
