@@ -72,7 +72,7 @@ func move(x, y, z float64) {
 	force.Mul(direction, inverse)
 
 	fn := mat.Formatted(force, mat.Prefix("    "), mat.Squeeze())
-	fmt.Printf("force = %v", fn)
+	fmt.Printf("force = %.2v\n", fn)
 
 	// just a test
 	motorA.SetSpeedSetpoint(int(force.At(0, 0) * float64(motorA.MaxSpeed()))).Command("run-forever")
@@ -89,4 +89,7 @@ func main() {
 	setupMotors()
 
 	move(0, 1, 0)
+	move(1, 0, 0)
+	move(0, -1, 0)
+	move(-1, 0, 0)
 }
