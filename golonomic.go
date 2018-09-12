@@ -38,9 +38,6 @@ func setupInverse() {
 	if err != nil {
 		log.Fatalf("failed to inverse matrix: %v", err)
 	}
-
-	fn := mat.Formatted(inverse, mat.Prefix("    "), mat.Squeeze())
-	fmt.Printf("i = %v", fn)
 }
 
 func setupMotors() {
@@ -86,9 +83,13 @@ func move(x, y, z float64) {
 	fmt.Printf("force = %v", fn)
 
 	// just a test
-	motorA.SetSpeedSetpoint(50 * motorA.maxSpeed / 100).Command("run-forever")
+	motorA.SetSpeedSetpoint(int(force.At(0, 0) * float64(motorA.maxSpeed))).Command("run-forever")
+	motorA.SetSpeedSetpoint(int(force.At(0, 1) * float64(motorB.maxSpeed))).Command("run-forever")
+	motorA.SetSpeedSetpoint(int(force.At(0, 2) * float64(motorC.maxSpeed))).Command("run-forever")
 	time.Sleep(time.Second / 2)
 	motorA.Command("stop")
+	motorB.Command("stop")
+	motorC.Command("stop")
 }
 
 func main() {
