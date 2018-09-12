@@ -18,14 +18,9 @@ const (
 
 var inverse = mat.NewDense(3, 3, nil)
 
-type tachoMotor struct {
-	*ev3dev.TachoMotor
-	maxSpeed int
-}
-
-var motorA tachoMotor
-var motorB tachoMotor
-var motorC tachoMotor
+var motorA *ev3dev.TachoMotor
+var motorB *ev3dev.TachoMotor
+var motorC *ev3dev.TachoMotor
 
 func setupInverse() {
 	data := []float64{
@@ -43,7 +38,7 @@ func setupInverse() {
 func setupMotors() {
 	var err error
 
-	motorA.TachoMotor, err = ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-l-motor")
+	motorA, err = ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-l-motor")
 	if err != nil {
 		log.Fatalf("failed to find large motor on outA: %v", err)
 	}
@@ -51,9 +46,8 @@ func setupMotors() {
 	if err != nil {
 		log.Fatalf("failed to set brake stop for large motor on outA: %v", err)
 	}
-	motorA.maxSpeed, err = motorA.MaxSpeed()
 
-	motorB.TachoMotor, err = ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
+	motorB, err = ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
 	if err != nil {
 		log.Fatalf("failed to find large motor on outB: %v", err)
 	}
@@ -61,9 +55,8 @@ func setupMotors() {
 	if err != nil {
 		log.Fatalf("failed to set brake stop for large motor on outB: %v", err)
 	}
-	motorB.maxSpeed, err = motorB.MaxSpeed()
 
-	motorC.TachoMotor, err = ev3dev.TachoMotorFor("ev3-ports:outC", "lego-ev3-l-motor")
+	motorC, err = ev3dev.TachoMotorFor("ev3-ports:outC", "lego-ev3-l-motor")
 	if err != nil {
 		log.Fatalf("failed to find large motor on outC: %v", err)
 	}
@@ -71,7 +64,6 @@ func setupMotors() {
 	if err != nil {
 		log.Fatalf("failed to set brake stop for large motor on outC: %v", err)
 	}
-	motorC.maxSpeed, err = motorC.MaxSpeed()
 }
 
 func move(x, y, z float64) {
@@ -83,9 +75,9 @@ func move(x, y, z float64) {
 	fmt.Printf("force = %v", fn)
 
 	// just a test
-	motorA.SetSpeedSetpoint(int(force.At(0, 0) * float64(motorA.maxSpeed))).Command("run-forever")
-	motorA.SetSpeedSetpoint(int(force.At(0, 1) * float64(motorB.maxSpeed))).Command("run-forever")
-	motorA.SetSpeedSetpoint(int(force.At(0, 2) * float64(motorC.maxSpeed))).Command("run-forever")
+	motorA.SetSpeedSetpoint(int(force.At(0, 0) * float64(motorA.MaxSpeed()))).Command("run-forever")
+	motorA.SetSpeedSetpoint(int(force.At(0, 1) * float64(motorB.MaxSpeed()))).Command("run-forever")
+	motorA.SetSpeedSetpoint(int(force.At(0, 2) * float64(motorC.MaxSpeed()))).Command("run-forever")
 	time.Sleep(time.Second / 2)
 	motorA.Command("stop")
 	motorB.Command("stop")
