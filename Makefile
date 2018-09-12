@@ -4,7 +4,7 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 BINARY_NAME=golonomic
-EV3_HOST=192.168.200.73
+EV3_HOST=192.168.221.132
 
 all: test build
 	
