@@ -30,9 +30,9 @@ var motorB *ev3dev.TachoMotor
 var motorC *ev3dev.TachoMotor
 
 type moveVectors struct {
-	x float64
-	y float64
-	s float64
+	X float64
+	Y float64
+	S float64
 }
 
 func setupEV3() {
@@ -71,12 +71,9 @@ func initMotor(m string) *ev3dev.TachoMotor {
 func vectorMove(v moveVectors) {
 	// relative to the robot, move in direction determined by x,y and angular speed s
 	// todo? add abstraction function to provide angle and speed instead of x/y components
-	direction := mat.NewDense(3, 1, []float64{v.x, v.y, v.s})
+	direction := mat.NewDense(3, 1, []float64{v.X, v.Y, v.S})
 	force := mat.NewDense(3, 1, nil)
 	force.Mul(inverse, direction)
-
-	fn := mat.Formatted(force, mat.Prefix("    "), mat.Squeeze())
-	fmt.Printf("force = %.2v\n", fn)
 
 	forceA := int(force.At(0, 0) * float64(motorA.MaxSpeed()))
 	forceB := int(force.At(1, 0) * float64(motorB.MaxSpeed()))

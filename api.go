@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -44,7 +43,6 @@ func api() {
 			w.WriteHeader(500)
 			return
 		}
-		fmt.Println(v)
 		vectorMove(v)
 		w.WriteHeader(204)
 	})
