@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -31,13 +32,19 @@ func api() {
 		w.Write(data)
 	})
 
+	// Move based on vector (direction+speed)
 	router.POST("/vectormove", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		var v moveVectors
+		if r.Body == nil {
+			w.WriteHeader(400)
+			return
+		}
+		v := moveVectors{}
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			w.WriteHeader(500)
 			return
 		}
+		fmt.Println(v)
 		vectorMove(v)
 		w.WriteHeader(200)
 	})

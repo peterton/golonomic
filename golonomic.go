@@ -35,7 +35,7 @@ type moveVectors struct {
 	s float64
 }
 
-func init() {
+func setupEV3() {
 	data := []float64{
 		math.Cos(a1 * math.Pi / 180), math.Cos(a2 * math.Pi / 180), math.Cos(a3 * math.Pi / 180),
 		math.Sin(a1 * math.Pi / 180), math.Sin(a2 * math.Pi / 180), math.Sin(a3 * math.Pi / 180),
@@ -46,6 +46,10 @@ func init() {
 	if err != nil {
 		log.Fatalf("failed to inverse matrix: %v", err)
 	}
+
+	motorA = initMotor("A")
+	motorB = initMotor("B")
+	motorC = initMotor("C")
 }
 
 func initMotor(m string) *ev3dev.TachoMotor {
@@ -62,12 +66,6 @@ func initMotor(m string) *ev3dev.TachoMotor {
 	}
 	log.Fatalf("specified unknown motor: %s", m)
 	return nil
-}
-
-func setupMotors() {
-	motorA = initMotor("A")
-	motorB = initMotor("B")
-	motorC = initMotor("C")
 }
 
 func vectorMove(v moveVectors) {
@@ -96,6 +94,7 @@ func vectorMove(v moveVectors) {
 }
 
 func main() {
+	setupEV3()
 	api()
 
 	for {
