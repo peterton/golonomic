@@ -93,6 +93,8 @@ func vectorMove(x, y, s float64) {
 }
 
 func main() {
+	api()
+
 	for {
 		h := irSensorInstance.getHeading()
 		d := irSensorInstance.getDistance()

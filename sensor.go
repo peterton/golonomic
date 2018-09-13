@@ -13,6 +13,24 @@ type irSensor struct {
 	raw *ev3dev.Sensor
 }
 
+// newIRSensor returns the irSensorInstance if it's already initialized,
+// otherwise it performs a lazy initialization of the irSensorInstance.
+func newIRSensor() *irSensor {
+	if irSensorInstance != nil {
+		return irSensorInstance
+	}
+
+	s, err := ev3dev.SensorFor("ev3-ports:in4", "lego-ev3-ir")
+	if err != nil {
+		log.Fatalf("failed to find large IR sensor on in4: %v", err)
+	}
+	s.SetMode("IR-SEEK")
+	irSensorInstance = &irSensor{
+		raw: s,
+	}
+	return irSensorInstance
+}
+
 // getHeading reads heading value from channel 0 of the IR sensor
 func (s *irSensor) getHeading() int {
 	v, err := s.raw.Value(0)
@@ -33,15 +51,4 @@ func (s *irSensor) getDistance() int {
 	}
 	value, _ := strconv.Atoi(v)
 	return value
-}
-
-func init() {
-	s, err := ev3dev.SensorFor("ev3-ports:in4", "lego-ev3-ir")
-	if err != nil {
-		log.Fatalf("failed to find large IR sensor on in4: %v", err)
-	}
-	s.SetMode("IR-SEEK")
-	irSensorInstance = &irSensor{
-		raw: s,
-	}
 }
