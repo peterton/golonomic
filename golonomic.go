@@ -66,8 +66,10 @@ func setupMotors() {
 	}
 }
 
-func move(x, y, z float64) {
-	direction := mat.NewDense(1, 3, []float64{x, y, z})
+func vectorMove(x, y, s float64) {
+	// relative to the robot, move in direction determined by x,y and angular speed s
+	// todo? add abstraction function to provide angle and speed instead of x/y components
+	direction := mat.NewDense(1, 3, []float64{x, y, s})
 	force := mat.NewDense(1, 3, nil)
 	force.Mul(direction, inverse)
 
@@ -88,8 +90,8 @@ func main() {
 	setupInverse()
 	setupMotors()
 
-	move(0, 1, 0)
-	move(1, 0, 0)
-	move(0, -1, 0)
-	move(-1, 0, 0)
+	vectorMove(0, 1, 0)
+	vectorMove(1, 0, 0)
+	vectorMove(0, -1, 0)
+	vectorMove(-1, 0, 0)
 }
