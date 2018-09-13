@@ -18,6 +18,11 @@ clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 
-run: build
+deploy: build
 	scp $(BINARY_NAME) robot@$(EV3_HOST):
-	ssh robot@$(EV3_HOST) ./$(BINARY_NAME)
+
+run: deploy
+	ssh -x robot@$(EV3_HOST) ./$(BINARY_NAME)
+
+run_only:
+	ssh -x robot@$(EV3_HOST) ./$(BINARY_NAME)
