@@ -90,6 +90,28 @@ func vectorMove(v moveVectors) {
 	motorC.Command("stop")
 }
 
+// Converts Polar r distance at degrees angle to x, y Cartesian
+// rounded to 4 decimals
+func cartesianToPolar(r, degrees float64) (x, y float64) {
+
+	//fmt.Printf("ctp: r:%v, degrees: %v\n", r, degrees)
+	x = math.Cos(degrees*math.Pi/180) * r
+	x = math.Round(x*10000) / 10000
+	y = r * math.Sin(degrees*math.Pi/180)
+	y = math.Round(y*10000) / 10000
+
+	return x, y
+}
+
+//moves the robot at degrees angle for speed s
+func movePolar(degrees, speed float64) (x, y float64) {
+
+	x, y = cartesianToPolar(1.0, degrees)
+	mv := moveVectors{X: x, Y: y, S: speed}
+	vectorMove(mv)
+	return x, y
+}
+
 func main() {
 	setupEV3()
 	api()
