@@ -46,7 +46,7 @@ func api() {
 		}
 		fmt.Println(v)
 		vectorMove(v)
-		w.WriteHeader(200)
+		w.WriteHeader(204)
 	})
 
 	// Start server
