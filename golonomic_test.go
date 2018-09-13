@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,20 +23,9 @@ func TestCartesianToPolar(t *testing.T) {
 		{5, 310, 3.2139, -3.8302},
 	}
 
-	fmt.Println("Starting test for cartesianToPolar...")
-	i := 0
 	for _, table := range tables {
-		i++
 		x, y := cartesianToPolar(table.r, table.degrees)
 		assert.Equal(t, table.x, x)
 		assert.Equal(t, table.y, y)
-		//fmt.Printf("Cartesian of (r:%v,degrees:%v) is (x:%v,y:%v)\n", table.r, table.degrees, x, y)
-		// if x != table.x {
-		// 	t.Errorf("ERROR: Cartesian of (%v,%v) was incorrect, got: (x:%v,y:%v), want: (x:%v, y:%v).", table.r, table.degrees, x, y, table.x, table.y)
-		// } else {
-		//    "CORRECT: Cartesian of (%v,%v) was incorrect, got: (x:%v,y:%v), want: (x:%v, y:%v).", table.r, table.degrees, x, y, table.x, table.y)
-		//
-		// }
 	}
-	fmt.Printf("\nTests for cartesianToPolar completed; %v tests run\n", i)
 }
