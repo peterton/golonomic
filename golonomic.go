@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	// angles of the motors reletive to the center of the robot
 	a1 = 0
 	a2 = 120
 	a3 = 240
@@ -35,35 +36,26 @@ func setupInverse() {
 	}
 }
 
+func initMotor(m string) *ev3dev.TachoMotor {
+	if m == "A" || m == "B" || m == "C" {
+		motor, err := ev3dev.TachoMotorFor("ev3-ports:out"+m, "lego-ev3-l-motor")
+		if err != nil {
+			log.Fatalf("failed to find large motor on out%s: %v", m, err)
+		}
+		err = motor.SetStopAction("brake").Err()
+		if err != nil {
+			log.Fatalf("failed to set brake stop for large motor on out%s: %v", m, err)
+		}
+		return motor
+	}
+	log.Fatalf("specified unknown motor: %s", m)
+	return nil
+}
+
 func setupMotors() {
-	var err error
-
-	motorA, err = ev3dev.TachoMotorFor("ev3-ports:outA", "lego-ev3-l-motor")
-	if err != nil {
-		log.Fatalf("failed to find large motor on outA: %v", err)
-	}
-	err = motorA.SetStopAction("brake").Err()
-	if err != nil {
-		log.Fatalf("failed to set brake stop for large motor on outA: %v", err)
-	}
-
-	motorB, err = ev3dev.TachoMotorFor("ev3-ports:outB", "lego-ev3-l-motor")
-	if err != nil {
-		log.Fatalf("failed to find large motor on outB: %v", err)
-	}
-	err = motorB.SetStopAction("brake").Err()
-	if err != nil {
-		log.Fatalf("failed to set brake stop for large motor on outB: %v", err)
-	}
-
-	motorC, err = ev3dev.TachoMotorFor("ev3-ports:outC", "lego-ev3-l-motor")
-	if err != nil {
-		log.Fatalf("failed to find large motor on outC: %v", err)
-	}
-	err = motorC.SetStopAction("brake").Err()
-	if err != nil {
-		log.Fatalf("failed to set brake stop for large motor on outC: %v", err)
-	}
+	motorA = initMotor("A")
+	motorB = initMotor("B")
+	motorC = initMotor("C")
 }
 
 func vectorMove(x, y, s float64) {
