@@ -9,7 +9,7 @@ EV3_HOST=192.168.200.73
 all: test build
 	
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -o $(BINARY_NAME) -v
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -ldflags "-s -w" -o $(BINARY_NAME) -v
 
 test:
 	$(GOTEST) -v ./...
