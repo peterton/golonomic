@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/ev3go/ev3dev"
@@ -29,6 +30,8 @@ var motorA *ev3dev.TachoMotor
 var motorB *ev3dev.TachoMotor
 var motorC *ev3dev.TachoMotor
 
+var irSensor *ev3dev.Sensor
+
 func setupInverse() {
 	data := []float64{
 		math.Cos(a1 * math.Pi / 180), math.Cos(a2 * math.Pi / 180), math.Cos(a3 * math.Pi / 180),
@@ -40,6 +43,15 @@ func setupInverse() {
 	if err != nil {
 		log.Fatalf("failed to inverse matrix: %v", err)
 	}
+}
+
+func initIR() {
+	var err error
+	irSensor, err = ev3dev.SensorFor("ev3-ports:in4", "lego-ev3-ir")
+	if err != nil {
+		log.Fatalf("failed to find large IR sensor on in4: %v", err)
+	}
+	irSensor.SetMode("IR-SEEK")
 }
 
 func initMotor(m string) *ev3dev.TachoMotor {
@@ -74,19 +86,73 @@ func vectorMove(x, y, s float64) {
 	fn := mat.Formatted(force, mat.Prefix("    "), mat.Squeeze())
 	fmt.Printf("force = %.2v\n", fn)
 
+	forceA := force.At(0, 0) * float64(motorA.MaxSpeed())
+	forceB := force.At(0, 1) * float64(motorB.MaxSpeed())
+	forceC := force.At(0, 2) * float64(motorC.MaxSpeed())
+	fmt.Println(forceA, forceB, forceC)
+
 	// just a test
-	motorA.SetSpeedSetpoint(int(force.At(0, 0) * float64(motorA.MaxSpeed()))).Command("run-forever")
-	motorB.SetSpeedSetpoint(int(force.At(0, 1) * float64(motorB.MaxSpeed()))).Command("run-forever")
-	motorC.SetSpeedSetpoint(int(force.At(0, 2) * float64(motorC.MaxSpeed()))).Command("run-forever")
-	time.Sleep(time.Second / 2)
-	motorA.Command("stop")
-	motorB.Command("stop")
-	motorC.Command("stop")
+	fmt.Println("starting motor A")
+	motorA.SetSpeedSetpoint(int(forceA)).Command("run-forever")
+	fmt.Println("starting motor B")
+	motorB.SetSpeedSetpoint(int(forceB)).Command("run-forever")
+	fmt.Println("starting motor C")
+	motorC.SetSpeedSetpoint(int(forceC)).Command("run-forever")
+	time.Sleep(2 * time.Second)
+	motorA.Command("reset")
+	motorB.Command("reset")
+	motorC.Command("reset")
 }
 
 func main() {
 	setupInverse()
 	setupMotors()
+	initIR()
+
+	fmt.Println(irSensor.Path())
+	fmt.Println(irSensor.Type())
+
+	/*
+		fmt.Println(irSensor.Driver())
+		fmt.Println(irSensor.Commands())
+		fmt.Println(irSensor.Decimals())
+		fmt.Println(irSensor.FirmwareVersion())
+		fmt.Println(irSensor.Modes())
+		fmt.Println(irSensor.Mode())
+		fmt.Println(irSensor.NumValues())
+		fmt.Println(irSensor.PollRate())
+		fmt.Println(irSensor.Units())
+		fmt.Println(irSensor.TextValues())
+		fmt.Println(irSensor.Uevent())
+	*/
+
+	// init poller so we can monitor buttons
+	buttonPoller := ev3dev.ButtonPoller{}
+
+	motorA.Command("run-direct")
+	for {
+		// read the channel 1 heading value from the IR sensor
+		v0, err := irSensor.Value(0)
+		if err != nil {
+			log.Printf("failed to read IR data: %v", err)
+			v0 = ""
+		}
+		heading, _ := strconv.Atoi(v0)
+
+		// motor rotation is in the same direction as heading, so this will
+		// cause the motor to rotate towards the beacon
+		motorA.SetDutyCycleSetpoint(heading)
+
+		// check for button presses
+		b, err := buttonPoller.Poll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if (b & ev3dev.Back) == ev3dev.Back {
+			// exit the loop
+			break
+		}
+	}
 
 	vectorMove(0, 1, 0)
 	vectorMove(1, 0, 0)
