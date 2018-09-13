@@ -17,6 +17,12 @@ const (
 	a3 = 240
 )
 
+// in order to be able to calculate the forces needed to be applied to each motor
+// when a direction and speed is given, the components of the force can be found with:
+// (x)   (cos(a1*π/180) cos(a2*π/180) cos(a3*π/180))(f1)
+// (y) = (sin(a1*π/180) sin(a2*π/180) sin(a3*π/180))(f2)
+// (s)   (1             1             1            )(f3)
+// if x,y,s are known, we need the inverse of the big matrix to be multiplied with x,y,s
 var inverse = mat.NewDense(3, 3, nil)
 
 var motorA *ev3dev.TachoMotor
