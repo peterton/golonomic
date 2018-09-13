@@ -22,6 +22,7 @@ deploy: build
 	scp $(BINARY_NAME) robot@$(EV3_HOST):
 
 run: deploy
+	ssh -x robot@$(EV3_HOST) pkill $(BINARY_NAME)
 	ssh -x robot@$(EV3_HOST) ./$(BINARY_NAME)
 
 run_only:

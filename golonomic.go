@@ -29,7 +29,13 @@ var motorA *ev3dev.TachoMotor
 var motorB *ev3dev.TachoMotor
 var motorC *ev3dev.TachoMotor
 
-func init() {
+type moveVectors struct {
+	X float64
+	Y float64
+	S float64
+}
+
+func setupEV3() {
 	data := []float64{
 		math.Cos(a1 * math.Pi / 180), math.Cos(a2 * math.Pi / 180), math.Cos(a3 * math.Pi / 180),
 		math.Sin(a1 * math.Pi / 180), math.Sin(a2 * math.Pi / 180), math.Sin(a3 * math.Pi / 180),
@@ -40,6 +46,10 @@ func init() {
 	if err != nil {
 		log.Fatalf("failed to inverse matrix: %v", err)
 	}
+
+	motorA = initMotor("A")
+	motorB = initMotor("B")
+	motorC = initMotor("C")
 }
 
 func initMotor(m string) *ev3dev.TachoMotor {
@@ -58,41 +68,30 @@ func initMotor(m string) *ev3dev.TachoMotor {
 	return nil
 }
 
-func setupMotors() {
-	motorA = initMotor("A")
-	motorB = initMotor("B")
-	motorC = initMotor("C")
-}
-
-func vectorMove(x, y, s float64) {
+func vectorMove(v moveVectors) {
 	// relative to the robot, move in direction determined by x,y and angular speed s
 	// todo? add abstraction function to provide angle and speed instead of x/y components
-	direction := mat.NewDense(1, 3, []float64{x, y, s})
-	force := mat.NewDense(1, 3, nil)
-	force.Mul(direction, inverse)
+	direction := mat.NewDense(3, 1, []float64{v.X, v.Y, v.S})
+	force := mat.NewDense(3, 1, nil)
+	force.Mul(inverse, direction)
 
-	fn := mat.Formatted(force, mat.Prefix("    "), mat.Squeeze())
-	fmt.Printf("force = %.2v\n", fn)
-
-	forceA := force.At(0, 0) * float64(motorA.MaxSpeed())
-	forceB := force.At(0, 1) * float64(motorB.MaxSpeed())
-	forceC := force.At(0, 2) * float64(motorC.MaxSpeed())
-	fmt.Println(forceA, forceB, forceC)
+	forceA := int(force.At(0, 0) * float64(motorA.MaxSpeed()))
+	forceB := int(force.At(1, 0) * float64(motorB.MaxSpeed()))
+	forceC := int(force.At(2, 0) * float64(motorC.MaxSpeed()))
+	fmt.Println("forces", forceA, forceB, forceC)
 
 	// just a test
-	fmt.Println("starting motor A")
-	motorA.SetSpeedSetpoint(int(forceA)).Command("run-forever")
-	fmt.Println("starting motor B")
-	motorB.SetSpeedSetpoint(int(forceB)).Command("run-forever")
-	fmt.Println("starting motor C")
-	motorC.SetSpeedSetpoint(int(forceC)).Command("run-forever")
+	motorA.SetSpeedSetpoint(forceA).Command("run-forever")
+	motorB.SetSpeedSetpoint(forceB).Command("run-forever")
+	motorC.SetSpeedSetpoint(forceC).Command("run-forever")
 	time.Sleep(2 * time.Second)
-	motorA.Command("reset")
-	motorB.Command("reset")
-	motorC.Command("reset")
+	motorA.Command("stop")
+	motorB.Command("stop")
+	motorC.Command("stop")
 }
 
 func main() {
+	setupEV3()
 	api()
 
 	for {
@@ -102,33 +101,4 @@ func main() {
 		fmt.Println("Heading:", h, " Distance:", d)
 		time.Sleep(1 * time.Second)
 	}
-
-	// setupMotors()
-	//
-	// // init poller so we can monitor buttons
-	// buttonPoller := ev3dev.ButtonPoller{}
-	//
-	// motorA.Command("run-direct")
-	// for {
-	// 	heading := irSensorInstance.getHeading()
-	//
-	// 	// motor rotation is in the same direction as heading, so this will
-	// 	// cause the motor to rotate towards the beacon
-	// 	motorA.SetDutyCycleSetpoint(heading)
-	//
-	// 	// check for button presses
-	// 	b, err := buttonPoller.Poll()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	if (b & ev3dev.Back) == ev3dev.Back {
-	// 		// exit the loop
-	// 		break
-	// 	}
-	// }
-	//
-	// vectorMove(0, 1, 0)
-	// vectorMove(1, 0, 0)
-	// vectorMove(0, -1, 0)
-	// vectorMove(-1, 0, 0)
 }
