@@ -29,7 +29,7 @@ var motorA *ev3dev.TachoMotor
 var motorB *ev3dev.TachoMotor
 var motorC *ev3dev.TachoMotor
 
-type moveVectors struct {
+type moveVector struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`
 	S float64 `json:"s"`
@@ -68,7 +68,7 @@ func initMotor(m string) *ev3dev.TachoMotor {
 	return nil
 }
 
-func vectorMove(v moveVectors) {
+func vectorMove(v moveVector) {
 	// relative to the robot, move in direction determined by x,y and angular speed s
 	// todo? add abstraction function to provide angle and speed instead of x/y components
 	direction := mat.NewDense(3, 1, []float64{v.X, v.Y, v.S})
@@ -107,7 +107,7 @@ func cartesianToPolar(r, degrees float64) (x, y float64) {
 func movePolar(degrees, speed float64) (x, y float64) {
 
 	x, y = cartesianToPolar(1.0, degrees)
-	mv := moveVectors{X: x, Y: y, S: speed}
+	mv := moveVector{X: x, Y: y, S: speed}
 	vectorMove(mv)
 	return x, y
 }
@@ -134,9 +134,34 @@ func remoteControl(s *irSensor, quit chan bool) {
 				BACK = 9
 				A+B  = 10
 				C+D  = 11
+
+				hold remote as:
+				  [C]
+				[A] [D]
+				  [B]
 			*/
-			button := s.getButton()
-			fmt.Println(button)
+			mv := moveVector{}
+			switch s.getButton() {
+			case 1:
+				mv = moveVector{X: -1, Y: 0, S: 0}
+			case 2:
+				mv = moveVector{X: 0, Y: -1, S: 0}
+			case 3:
+				mv = moveVector{X: 0, Y: 1, S: 0}
+			case 4:
+				mv = moveVector{X: 1, Y: 0, S: 0}
+			case 5:
+				mv = moveVector{X: -1, Y: 1, S: 0}
+			case 8:
+				mv = moveVector{X: 1, Y: -1, S: 0}
+			case 9:
+				return
+			case 10:
+				mv = moveVector{X: -1, Y: -1, S: 0}
+			case 11:
+				mv = moveVector{X: 1, Y: 1, S: 0}
+			}
+			vectorMove(mv)
 		}
 	}
 }
