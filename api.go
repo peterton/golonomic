@@ -42,7 +42,7 @@ func api() {
 			w.WriteHeader(400)
 			return
 		}
-		v := moveVectors{}
+		v := moveVector{}
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			w.WriteHeader(500)
