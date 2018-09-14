@@ -46,8 +46,7 @@ func getVersion() string {
 		"commit:", commit,
 		"built @", builtAt,
 		"by", builtBy,
-		"on", builtOn,
-		"\n"}
+		"on", builtOn}
 	return strings.Join(s, " ")
 }
 
