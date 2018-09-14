@@ -148,6 +148,9 @@ func remoteControl(s *irSensor, quit chan bool) {
 	for {
 		select {
 		case <-quit:
+			motorA.Command("stop")
+			motorB.Command("stop")
+			motorC.Command("stop")
 			return
 		default:
 			/*
@@ -206,6 +209,9 @@ func beaconTracker(s *irSensor, quit chan bool) {
 	for {
 		select {
 		case <-quit:
+			motorA.Command("stop")
+			motorB.Command("stop")
+			motorC.Command("stop")
 			return
 		default:
 			heading := s.getHeading()
