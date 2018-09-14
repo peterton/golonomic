@@ -173,12 +173,17 @@ func beaconTracker(s *irSensor, quit chan bool) {
 			// ir sensor is placed at 180 degress (x = 0, y = -1)
 			if distance == -128 {
 				// if no beacon found, rotate (x = 0, y = 0, s = 1)
-				mv := moveVector{X: 0, Y: 0, W: 1}
+				// TODO: save state which side it left, turn that way!
+				mv := moveVector{X: 0, Y: 0, W: .5}
 				vectorMove(mv)
 			} else {
 				// heading ranges from -25 to 25; what are these values?
 				// 0..+25 is 180..>180 degress, 0..-25 is 180..<180 degrees
-				movePolar(180+float64(heading), 0)
+				//movePolar(180, float64(heading)/25)
+				// turn based on heading
+				// drive based on distance (speed?) -- go slow!
+				mv := moveVector{X: 0, Y: float64(distance) / -100, W: float64(heading) / -25}
+				vectorMove(mv)
 			}
 		}
 	}

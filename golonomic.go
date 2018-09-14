@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	branch  string
 	commit  string
 	builtAt string
 	builtBy string
@@ -17,6 +18,7 @@ var (
 
 func getVersion() string {
 	s := []string{
+		"branch:", branch,
 		"commit:", commit,
 		"built @", builtAt,
 		"by", builtBy,
