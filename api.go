@@ -143,23 +143,23 @@ func api() {
 
 		switch dp.Pattern {
 		case "square":
-			vectorMove(moveVector{X: 1, Y: 0, S: 0})
+			vectorMove(moveVector{X: 1, Y: 0, W: 0})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: 0, Y: 1, S: 0})
+			vectorMove(moveVector{X: 0, Y: 1, W: 0})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: -1, Y: 0, S: 0})
+			vectorMove(moveVector{X: -1, Y: 0, W: 0})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: 0, Y: -1, S: 0})
+			vectorMove(moveVector{X: 0, Y: -1, W: 0})
 			time.Sleep(2 * time.Second)
 			stopMotors()
 		case "roundedsquare":
-			vectorMove(moveVector{X: 1, Y: 0, S: 1})
+			vectorMove(moveVector{X: 1, Y: 0, W: 1})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: 0, Y: 1, S: 1})
+			vectorMove(moveVector{X: 0, Y: 1, W: 1})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: -1, Y: 0, S: 1})
+			vectorMove(moveVector{X: -1, Y: 0, W: 1})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: 0, Y: -1, S: 1})
+			vectorMove(moveVector{X: 0, Y: -1, W: 1})
 			time.Sleep(2 * time.Second)
 			stopMotors()
 		default:
