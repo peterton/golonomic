@@ -101,11 +101,11 @@ func initMotor(m string) *ev3dev.TachoMotor {
 	if m == "A" || m == "B" || m == "C" {
 		motor, err := ev3dev.TachoMotorFor("ev3-ports:out"+m, "lego-ev3-l-motor")
 		if err != nil {
-			log.Fatalf("failed to find large motor on out%W: %v", m, err)
+			log.Fatalf("failed to find large motor on out%v: %v", m, err)
 		}
 		err = motor.SetStopAction("brake").Err()
 		if err != nil {
-			log.Fatalf("failed to set brake stop for large motor on out%W: %v", m, err)
+			log.Fatalf("failed to set brake stop for large motor on out%v: %v", m, err)
 		}
 		return motor
 	}
