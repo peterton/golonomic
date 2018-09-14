@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -67,7 +66,7 @@ func api() {
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			w.WriteHeader(500)
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 		vectorMove(v)
@@ -84,7 +83,7 @@ func api() {
 		err := json.NewDecoder(r.Body).Decode(&rc)
 		if err != nil {
 			w.WriteHeader(500)
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 
@@ -111,7 +110,7 @@ func api() {
 		err := json.NewDecoder(r.Body).Decode(&beacon)
 		if err != nil {
 			w.WriteHeader(500)
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 
@@ -138,7 +137,7 @@ func api() {
 		err := json.NewDecoder(r.Body).Decode(&dp)
 		if err != nil {
 			w.WriteHeader(500)
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
 
