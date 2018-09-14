@@ -27,6 +27,12 @@
 			"revisionTime": "2016-01-10T10:55:54Z"
 		},
 		{
+			"checksumSHA1": "ZLkqsBqmc4RVc/Ng1ldrGZuTE8o=",
+			"path": "github.com/rs/cors",
+			"revision": "dc7332ab32be5dfec05dae2a6ab79cbfa53b6407",
+			"revisionTime": "2018-08-26T18:02:56Z"
+		},
+		{
 			"checksumSHA1": "BBudH/js1dNI/nEfTwsAYUo9l2M=",
 			"path": "github.com/stretchr/objx",
 			"revision": "ef50b0de28773081167c97fc27cf29a0bf8b8c71",

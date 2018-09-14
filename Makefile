@@ -29,5 +29,8 @@ deploy: build stop
 stop:
 	ssh -x robot@$(EV3_HOST) "pkill $(BINARY_NAME) || true"
 
+run: deploy 
+	ssh -x robot@$(EV3_HOST) ./$(BINARY_NAME)
+
 run_only: stop
 	ssh -x robot@$(EV3_HOST) ./$(BINARY_NAME)
