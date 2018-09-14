@@ -15,7 +15,7 @@ type irSensor struct {
 
 // newIRSensor returns the irSensorInstance if it's already initialized,
 // otherwise it performs a lazy initialization of the irSensorInstance.
-func newIRSensor() *irSensor {
+func newIRSensor(mode string) *irSensor {
 	if irSensorInstance != nil {
 		return irSensorInstance
 	}
@@ -24,7 +24,7 @@ func newIRSensor() *irSensor {
 	if err != nil {
 		log.Fatalf("failed to find large IR sensor on in4: %v", err)
 	}
-	s.SetMode("IR-SEEK")
+	s.SetMode(mode)
 	irSensorInstance = &irSensor{
 		raw: s,
 	}
@@ -36,7 +36,6 @@ func (s *irSensor) getHeading() int {
 	v, err := s.raw.Value(0)
 	if err != nil {
 		log.Printf("failed to read IR data channel 0: %v", err)
-		v = "0"
 	}
 	value, _ := strconv.Atoi(v)
 	return value
@@ -47,7 +46,16 @@ func (s *irSensor) getDistance() int {
 	v, err := s.raw.Value(1)
 	if err != nil {
 		log.Printf("failed to read IR data channel 1: %v", err)
-		v = "0"
+	}
+	value, _ := strconv.Atoi(v)
+	return value
+}
+
+// getButton reads which button was pressed from channel 0 of the IR sensor
+func (s *irSensor) getButton() int {
+	v, err := s.raw.Value(0)
+	if err != nil {
+		log.Printf("failed to read IR data channel 0: %v", err)
 	}
 	value, _ := strconv.Atoi(v)
 	return value
