@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math"
+	"strings"
 
 	"github.com/ev3go/ev3dev"
 	"gonum.org/v1/gonum/mat"
@@ -39,6 +39,16 @@ type moveVector struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`
 	S float64 `json:"s"`
+}
+
+func getVersion() string {
+	s := []string{
+		"commit:", commit,
+		"built @", builtAt,
+		"by", builtBy,
+		"on", builtOn,
+		"\n"}
+	return strings.Join(s, " ")
 }
 
 func getPower() (float64, float64, float64, float64) {
@@ -131,9 +141,8 @@ func vectorMove(v moveVector) {
 		motorA.SetSpeedSetpoint(forceA).Command("run-forever")
 		motorB.SetSpeedSetpoint(forceB).Command("run-forever")
 		motorC.SetSpeedSetpoint(forceC).Command("run-forever")
-
-		getPower()
 	}
+	getPower()
 }
 
 // Converts Polar r distance at degrees angle to x, y Cartesian
@@ -242,9 +251,7 @@ func beaconTracker(s *irSensor, quit chan bool) {
 }
 
 func main() {
-	fmt.Print("Version info :: ")
-	fmt.Printf("commit: %s ", commit)
-	fmt.Printf("built @ %s by %s on %s\n", builtAt, builtBy, builtOn)
+	log.Print("version: ", getVersion())
 
 	setupEV3()
 	api()

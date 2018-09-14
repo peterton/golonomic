@@ -25,7 +25,8 @@ func api() {
 	router := httprouter.New()
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		data, _ := json.Marshal(map[string]string{
-			"name": "I'm a 🤖",
+			"name":    "I'm a 🤖",
+			"version": getVersion(),
 		})
 		w.WriteHeader(200)
 		w.Write(data)
