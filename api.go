@@ -151,7 +151,7 @@ func api() {
 			time.Sleep(2 * time.Second)
 			vectorMove(moveVector{X: 0, Y: -1, S: 0})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: 0, Y: 0, S: 0})
+			stopMotors()
 		case "roundedsquare":
 			vectorMove(moveVector{X: 1, Y: 0, S: 1})
 			time.Sleep(2 * time.Second)
@@ -161,7 +161,7 @@ func api() {
 			time.Sleep(2 * time.Second)
 			vectorMove(moveVector{X: 0, Y: -1, S: 1})
 			time.Sleep(2 * time.Second)
-			vectorMove(moveVector{X: 0, Y: 0, S: 0})
+			stopMotors()
 		default:
 			w.WriteHeader(400)
 			return
