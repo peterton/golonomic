@@ -70,8 +70,10 @@ func api() {
 		s := newIRSensor("IR-REMOTE")
 		quit := make(chan bool)
 		if rc.Enabled {
+			log.Println("starting remote control mode")
 			go remoteControl(s, quit)
 		} else {
+			log.Println("stopping remote control mode")
 			quit <- true
 		}
 
