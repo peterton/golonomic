@@ -198,23 +198,23 @@ func remoteControl(s *irSensor, quit chan bool) {
 			log.Printf("RC mode: button %v pressed", btn)
 			switch btn {
 			case 1:
-				mv = moveVector{X: -1, Y: 0, S: 0}
+				mv = moveVector{X: 1, Y: 0, S: 0}
 			case 2:
 				mv = moveVector{X: 0, Y: -1, S: 0}
 			case 3:
 				mv = moveVector{X: 0, Y: 1, S: 0}
 			case 4:
-				mv = moveVector{X: 1, Y: 0, S: 0}
+				mv = moveVector{X: -1, Y: 0, S: 0}
 			case 5:
-				mv = moveVector{X: -1, Y: 1, S: 0}
+				mv = moveVector{X: 1, Y: 1, S: 0}
 			case 8:
-				mv = moveVector{X: 1, Y: -1, S: 0}
+				mv = moveVector{X: -1, Y: -1, S: 0}
 			case 9:
 				mv = moveVector{X: 0, Y: 0, S: 1}
 			case 10:
-				mv = moveVector{X: -1, Y: -1, S: 0}
+				mv = moveVector{X: 1, Y: -1, S: 0}
 			case 11:
-				mv = moveVector{X: 1, Y: 1, S: 0}
+				mv = moveVector{X: -1, Y: 1, S: 0}
 			default:
 				mv = moveVector{X: 0, Y: 0, S: 0}
 			}
