@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math"
-	"time"
 
 	"github.com/ev3go/ev3dev"
 	"gonum.org/v1/gonum/mat"
@@ -69,25 +67,29 @@ func initMotor(m string) *ev3dev.TachoMotor {
 }
 
 func vectorMove(v moveVector) {
-	// relative to the robot, move in direction determined by x,y and angular speed s
-	// todo? add abstraction function to provide angle and speed instead of x/y components
-	direction := mat.NewDense(3, 1, []float64{v.X, v.Y, v.S})
-	force := mat.NewDense(3, 1, nil)
-	force.Mul(inverse, direction)
+	// if vector is 0,0,0 - do stop
+	// if anything else, just run-forever
+	if v.X == 0 && v.Y == 0 && v.S == 0 {
+		motorA.Command("stop")
+		motorB.Command("stop")
+		motorC.Command("stop")
+	} else {
+		// relative to the robot, move in direction determined by x,y and angular speed s
+		// todo? add abstraction function to provide angle and speed instead of x/y components
+		direction := mat.NewDense(3, 1, []float64{v.X, v.Y, v.S})
+		force := mat.NewDense(3, 1, nil)
+		force.Mul(inverse, direction)
 
-	forceA := int(force.At(0, 0) * float64(motorA.MaxSpeed()))
-	forceB := int(force.At(1, 0) * float64(motorB.MaxSpeed()))
-	forceC := int(force.At(2, 0) * float64(motorC.MaxSpeed()))
-	fmt.Println("forces", forceA, forceB, forceC)
+		forceA := int(force.At(0, 0) * float64(motorA.MaxSpeed()))
+		forceB := int(force.At(1, 0) * float64(motorB.MaxSpeed()))
+		forceC := int(force.At(2, 0) * float64(motorC.MaxSpeed()))
+		log.Println("forces", forceA, forceB, forceC)
 
-	// just a test
-	motorA.SetSpeedSetpoint(forceA).Command("run-forever")
-	motorB.SetSpeedSetpoint(forceB).Command("run-forever")
-	motorC.SetSpeedSetpoint(forceC).Command("run-forever")
-	time.Sleep(2 * time.Second)
-	motorA.Command("stop")
-	motorB.Command("stop")
-	motorC.Command("stop")
+		// just a test
+		motorA.SetSpeedSetpoint(forceA).Command("run-forever")
+		motorB.SetSpeedSetpoint(forceB).Command("run-forever")
+		motorC.SetSpeedSetpoint(forceC).Command("run-forever")
+	}
 }
 
 // Converts Polar r distance at degrees angle to x, y Cartesian
@@ -141,7 +143,9 @@ func remoteControl(s *irSensor, quit chan bool) {
 				  [B]
 			*/
 			mv := moveVector{}
-			switch s.getButton() {
+			btn := s.getButton()
+			log.Printf("RC mode: button %s pressed", btn)
+			switch btn {
 			case 1:
 				mv = moveVector{X: -1, Y: 0, S: 0}
 			case 2:
@@ -160,6 +164,8 @@ func remoteControl(s *irSensor, quit chan bool) {
 				mv = moveVector{X: -1, Y: -1, S: 0}
 			case 11:
 				mv = moveVector{X: 1, Y: 1, S: 0}
+			default:
+				mv = moveVector{X: 0, Y: 0, S: 0}
 			}
 			vectorMove(mv)
 		}
@@ -169,12 +175,4 @@ func remoteControl(s *irSensor, quit chan bool) {
 func main() {
 	setupEV3()
 	api()
-
-	for {
-		h := irSensorInstance.getHeading()
-		d := irSensorInstance.getDistance()
-
-		fmt.Println("Heading:", h, " Distance:", d)
-		time.Sleep(1 * time.Second)
-	}
 }
