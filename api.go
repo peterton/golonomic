@@ -19,6 +19,7 @@ type drivePattern struct {
 }
 
 func api() {
+	quit := make(chan bool)
 
 	// Home
 	router := httprouter.New()
@@ -88,7 +89,7 @@ func api() {
 		}
 
 		s := newIRSensor("IR-REMOTE")
-		quit := make(chan bool)
+
 		if rc.Enabled {
 			log.Println("starting remote control mode")
 			go remoteControl(s, quit)
@@ -115,7 +116,6 @@ func api() {
 		}
 
 		s := newIRSensor("IR-SEEK")
-		quit := make(chan bool)
 		if beacon.Enabled {
 			log.Println("starting beacon tracking mode")
 			go beaconTracker(s, quit)
