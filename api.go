@@ -2,11 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 )
+
+type remoteControlMode struct {
+	Enabled bool `json:"enabled"`
+}
 
 func api() {
 
@@ -22,7 +27,7 @@ func api() {
 
 	// Sensor Readings
 	router.GET("/sensor", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		s := newIRSensor()
+		s := newIRSensor("IR-SEEK")
 		data, _ := json.Marshal(map[string]interface{}{
 			"heading":  s.getHeading(),
 			"distance": s.getDistance(),
@@ -41,9 +46,35 @@ func api() {
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			w.WriteHeader(500)
+			fmt.Println(err)
 			return
 		}
 		vectorMove(v)
+		w.WriteHeader(204)
+	})
+
+	// Put bot in RC mode
+	router.POST("/rc", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		if r.Body == nil {
+			w.WriteHeader(400)
+			return
+		}
+		rc := remoteControlMode{}
+		err := json.NewDecoder(r.Body).Decode(&rc)
+		if err != nil {
+			w.WriteHeader(500)
+			fmt.Println(err)
+			return
+		}
+
+		s := newIRSensor("IR-REMOTE")
+		quit := make(chan bool)
+		if rc.Enabled {
+			go remoteControl(s, quit)
+		} else {
+			quit <- true
+		}
+
 		w.WriteHeader(204)
 	})
 
