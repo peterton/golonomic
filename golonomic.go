@@ -38,7 +38,7 @@ var motorC *ev3dev.TachoMotor
 type moveVector struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`
-	S float64 `json:"s"`
+	W float64 `json:"w"`
 }
 
 func getVersion() string {
@@ -74,7 +74,7 @@ func getPower() (float64, float64, float64, float64) {
 		log.Fatalf("could not read min design voltage: %v", err)
 	}
 
-	log.Printf("current power stats: V=%.2fV I=%.0fmA P=%.3fW (designed voltage range:%.2fV-%.2fV)\n", v, i, i*v/1000, vMin/10, vMax/10)
+	log.Printf("current power statW: V=%.2fV I=%.0fmA P=%.3fW (designed voltage range:%.2fV-%.2fV)\n", v, i, i*v/1000, vMin/10, vMax/10)
 	return v, i, vMax, vMin
 }
 
@@ -101,11 +101,11 @@ func initMotor(m string) *ev3dev.TachoMotor {
 	if m == "A" || m == "B" || m == "C" {
 		motor, err := ev3dev.TachoMotorFor("ev3-ports:out"+m, "lego-ev3-l-motor")
 		if err != nil {
-			log.Fatalf("failed to find large motor on out%s: %v", m, err)
+			log.Fatalf("failed to find large motor on out%W: %v", m, err)
 		}
 		err = motor.SetStopAction("brake").Err()
 		if err != nil {
-			log.Fatalf("failed to set brake stop for large motor on out%s: %v", m, err)
+			log.Fatalf("failed to set brake stop for large motor on out%W: %v", m, err)
 		}
 		return motor
 	}
@@ -122,12 +122,12 @@ func stopMotors() {
 func vectorMove(v moveVector) {
 	// if vector is 0,0,0 - do stop
 	// if anything else, just run-forever
-	if v.X == 0 && v.Y == 0 && v.S == 0 {
+	if v.X == 0 && v.Y == 0 && v.W == 0 {
 		stopMotors()
 	} else {
 		// relative to the robot, move in direction determined by x,y and angular speed s
 		// todo? add abstraction function to provide angle and speed instead of x/y components
-		direction := mat.NewDense(3, 1, []float64{v.X, v.Y, v.S})
+		direction := mat.NewDense(3, 1, []float64{v.X, v.Y, v.W})
 		force := mat.NewDense(3, 1, nil)
 		force.Mul(inverse, direction)
 
@@ -141,14 +141,13 @@ func vectorMove(v moveVector) {
 		motorB.SetSpeedSetpoint(forceB).Command("run-forever")
 		motorC.SetSpeedSetpoint(forceC).Command("run-forever")
 	}
-	//getPower()
 }
 
 // Converts Polar r distance at degrees angle to x, y Cartesian
 // rounded to 4 decimals
 func cartesianToPolar(r, degrees float64) (x, y float64) {
 
-	//fmt.Printf("ctp: r:%v, degrees: %v\n", r, degrees)
+	//fmt.Printf("ctp: r:%v, degreeW: %v\n", r, degrees)
 	x = math.Cos(degrees*math.Pi/180) * r
 	x = math.Round(x*10000) / 10000
 	y = r * math.Sin(degrees*math.Pi/180)
@@ -158,9 +157,9 @@ func cartesianToPolar(r, degrees float64) (x, y float64) {
 }
 
 //moves the robot at degrees angle with angular speed s
-func movePolar(degrees, speed float64) {
+func movePolar(degrees, angularSpeed float64) {
 	x, y := cartesianToPolar(1.0, degrees)
-	mv := moveVector{X: x, Y: y, S: speed}
+	mv := moveVector{X: x, Y: y, W: angularSpeed}
 	vectorMove(mv)
 }
 
@@ -195,28 +194,28 @@ func remoteControl(s *irSensor, quit chan bool) {
 			*/
 			mv := moveVector{}
 			btn := s.getButton()
-			//log.Printf("RC mode: button %v pressed", btn)
+			log.Printf("RC mode: button %v pressed", btn)
 			switch btn {
 			case 1:
-				mv = moveVector{X: 1, Y: 0, S: 0}
+				mv = moveVector{X: 1, Y: 0, W: 0}
 			case 2:
-				mv = moveVector{X: 0, Y: -1, S: 0}
+				mv = moveVector{X: 0, Y: -1, W: 0}
 			case 3:
-				mv = moveVector{X: 0, Y: 1, S: 0}
+				mv = moveVector{X: 0, Y: 1, W: 0}
 			case 4:
-				mv = moveVector{X: -1, Y: 0, S: 0}
+				mv = moveVector{X: -1, Y: 0, W: 0}
 			case 5:
-				mv = moveVector{X: 1, Y: 1, S: 0}
+				mv = moveVector{X: 1, Y: 1, W: 0}
 			case 8:
-				mv = moveVector{X: -1, Y: -1, S: 0}
+				mv = moveVector{X: -1, Y: -1, W: 0}
 			case 9:
-				mv = moveVector{X: 0, Y: 0, S: 1}
+				mv = moveVector{X: 0, Y: 0, W: 1}
 			case 10:
-				mv = moveVector{X: 1, Y: -1, S: 0}
+				mv = moveVector{X: 1, Y: -1, W: 0}
 			case 11:
-				mv = moveVector{X: -1, Y: 1, S: 0}
+				mv = moveVector{X: -1, Y: 1, W: 0}
 			default:
-				mv = moveVector{X: 0, Y: 0, S: 0}
+				mv = moveVector{X: 0, Y: 0, W: 0}
 			}
 			vectorMove(mv)
 		}
@@ -238,12 +237,12 @@ func beaconTracker(s *irSensor, quit chan bool) {
 			// ir sensor is placed at 180 degress (x = 0, y = -1)
 			if distance == -128 {
 				// if no beacon found, rotate (x = 0, y = 0, s = 1)
-				mv := moveVector{X: 0, Y: 0, S: 1}
+				mv := moveVector{X: 0, Y: 0, W: 1}
 				vectorMove(mv)
 			} else {
 				// heading ranges from -25 to 25; what are these values?
 				// 0..+25 is 180..>180 degress, 0..-25 is 180..<180 degrees
-				movePolar(180+float64(heading)*3, 0)
+				movePolar(180+float64(heading), 0)
 			}
 		}
 	}
