@@ -33,6 +33,33 @@ type moveVector struct {
 	S float64 `json:"s"`
 }
 
+func printPower() {
+	p := ev3dev.PowerSupply("")
+	p = ev3dev.PowerSupply(p.String()) // Cache the driver name if not given.
+
+	v, err := p.Voltage()
+	if err != nil {
+		log.Fatalf("could not read voltage: %v", err)
+	}
+
+	i, err := p.Current()
+	if err != nil {
+		log.Fatalf("could not read current: %v", err)
+	}
+
+	vMax, err := p.VoltageMax()
+	if err != nil {
+		log.Fatalf("could not read max design voltage: %v", err)
+	}
+
+	vMin, err := p.VoltageMin()
+	if err != nil {
+		log.Fatalf("could not read min design voltage: %v", err)
+	}
+
+	log.Printf("current power stats: V=%.2fV I=%.0fmA P=%.3fW (designed voltage range:%.2fV-%.2fV)\n", v, i, i*v/1000, vMin/10, vMax/10)
+}
+
 func setupEV3() {
 	data := []float64{
 		math.Cos(a1 * math.Pi / 180), math.Cos(a2 * math.Pi / 180), math.Cos(a3 * math.Pi / 180),
@@ -48,6 +75,8 @@ func setupEV3() {
 	motorA = initMotor("A")
 	motorB = initMotor("B")
 	motorC = initMotor("C")
+
+	printPower()
 }
 
 func initMotor(m string) *ev3dev.TachoMotor {
@@ -89,6 +118,8 @@ func vectorMove(v moveVector) {
 		motorA.SetSpeedSetpoint(forceA).Command("run-forever")
 		motorB.SetSpeedSetpoint(forceB).Command("run-forever")
 		motorC.SetSpeedSetpoint(forceC).Command("run-forever")
+
+		printPower()
 	}
 }
 

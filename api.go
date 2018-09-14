@@ -92,8 +92,8 @@ func api() {
 			w.WriteHeader(400)
 			return
 		}
-		rc := controlMode{}
-		err := json.NewDecoder(r.Body).Decode(&rc)
+		beacon := controlMode{}
+		err := json.NewDecoder(r.Body).Decode(&beacon)
 		if err != nil {
 			w.WriteHeader(500)
 			fmt.Println(err)
@@ -102,9 +102,9 @@ func api() {
 
 		s := newIRSensor("IR-SEEK")
 		quit := make(chan bool)
-		if rc.Enabled {
+		if beacon.Enabled {
 			log.Println("starting beacon tracking mode")
-			go remoteControl(s, quit)
+			go beaconTracker(s, quit)
 		} else {
 			log.Println("stopping beacon tracking mode")
 			quit <- true
