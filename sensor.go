@@ -51,7 +51,7 @@ func (s *irSensor) getDistance() int {
 	return value
 }
 
-// getButton reads which button was pressed from channel 0 in IR-REMOTE mode
+// getButton reads which button was pressed from channel 0 of the IR sensor
 func (s *irSensor) getButton() int {
 	v, err := s.raw.Value(0)
 	if err != nil {

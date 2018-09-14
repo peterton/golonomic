@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-type remoteControlMode struct {
+type controlMode struct {
 	Enabled bool `json:"enabled"`
 }
 
@@ -59,7 +59,7 @@ func api() {
 			w.WriteHeader(400)
 			return
 		}
-		rc := remoteControlMode{}
+		rc := controlMode{}
 		err := json.NewDecoder(r.Body).Decode(&rc)
 		if err != nil {
 			w.WriteHeader(500)
@@ -74,6 +74,33 @@ func api() {
 			go remoteControl(s, quit)
 		} else {
 			log.Println("stopping remote control mode")
+			quit <- true
+		}
+
+		w.WriteHeader(204)
+	})
+
+	// Put bot in beacon tracking mode
+	router.POST("/beacon", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		if r.Body == nil {
+			w.WriteHeader(400)
+			return
+		}
+		rc := controlMode{}
+		err := json.NewDecoder(r.Body).Decode(&rc)
+		if err != nil {
+			w.WriteHeader(500)
+			fmt.Println(err)
+			return
+		}
+
+		s := newIRSensor("IR-SEEK")
+		quit := make(chan bool)
+		if rc.Enabled {
+			log.Println("starting beacon tracking mode")
+			go remoteControl(s, quit)
+		} else {
+			log.Println("stopping beacon tracking mode")
 			quit <- true
 		}
 

@@ -144,7 +144,7 @@ func remoteControl(s *irSensor, quit chan bool) {
 			*/
 			mv := moveVector{}
 			btn := s.getButton()
-			log.Printf("RC mode: button %s pressed", btn)
+			log.Printf("RC mode: button %v pressed", btn)
 			switch btn {
 			case 1:
 				mv = moveVector{X: -1, Y: 0, S: 0}
@@ -167,6 +167,26 @@ func remoteControl(s *irSensor, quit chan bool) {
 			default:
 				mv = moveVector{X: 0, Y: 0, S: 0}
 			}
+			vectorMove(mv)
+		}
+	}
+}
+
+func beaconTracker(s *irSensor, quit chan bool) {
+	for {
+		select {
+		case <-quit:
+			return
+		default:
+			heading := s.getHeading()
+			distance := s.getDistance()
+			log.Printf("Beacon found in heading %v at distance %v", heading, distance)
+
+			// distance doesn't really matter, we need heading
+			// ir sensor is placed at 180 degress (x = 0, y = -1)
+			// idea: if no beacon found, rotate? (x = 0, y = 0, s = 1)
+			mv := moveVector{}
+			mv = moveVector{X: 0, Y: 0, S: 0}
 			vectorMove(mv)
 		}
 	}
