@@ -96,13 +96,17 @@ func initMotor(m string) *ev3dev.TachoMotor {
 	return nil
 }
 
+func stopMotors() {
+	motorA.Command("stop")
+	motorB.Command("stop")
+	motorC.Command("stop")
+}
+
 func vectorMove(v moveVector) {
 	// if vector is 0,0,0 - do stop
 	// if anything else, just run-forever
 	if v.X == 0 && v.Y == 0 && v.S == 0 {
-		motorA.Command("stop")
-		motorB.Command("stop")
-		motorC.Command("stop")
+		stopMotors()
 	} else {
 		// relative to the robot, move in direction determined by x,y and angular speed s
 		// todo? add abstraction function to provide angle and speed instead of x/y components
@@ -148,9 +152,7 @@ func remoteControl(s *irSensor, quit chan bool) {
 	for {
 		select {
 		case <-quit:
-			motorA.Command("stop")
-			motorB.Command("stop")
-			motorC.Command("stop")
+			stopMotors()
 			return
 		default:
 			/*
@@ -209,9 +211,7 @@ func beaconTracker(s *irSensor, quit chan bool) {
 	for {
 		select {
 		case <-quit:
-			motorA.Command("stop")
-			motorB.Command("stop")
-			motorC.Command("stop")
+			stopMotors()
 			return
 		default:
 			heading := s.getHeading()
