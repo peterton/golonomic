@@ -30,9 +30,9 @@ var motorB *ev3dev.TachoMotor
 var motorC *ev3dev.TachoMotor
 
 type moveVectors struct {
-	X float64
-	Y float64
-	S float64
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+	S float64 `json:"s"`
 }
 
 func setupEV3() {
@@ -110,6 +110,35 @@ func movePolar(degrees, speed float64) (x, y float64) {
 	mv := moveVectors{X: x, Y: y, S: speed}
 	vectorMove(mv)
 	return x, y
+}
+
+func remoteControl(s *irSensor, quit chan bool) {
+	for {
+		select {
+		case <-quit:
+			return
+		default:
+			/*
+				[_BACK_]
+				[A]  [C]
+				[B]  [D]
+
+				A    = 1
+				B    = 2
+				C    = 3
+				D    = 4
+				A+C  = 5
+				A+D  = 6
+				B+C  = 7
+				B+D  = 8
+				BACK = 9
+				A+B  = 10
+				C+D  = 11
+			*/
+			button := s.getButton()
+			fmt.Println(button)
+		}
+	}
 }
 
 func main() {
