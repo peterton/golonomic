@@ -42,6 +42,20 @@ func api() {
 		w.Write(data)
 	})
 
+	// Power Readings
+	router.GET("/power", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		v, i, vMax, vMin := getPower()
+		data, _ := json.Marshal(map[string]interface{}{
+			"V":    v,
+			"I":    i,
+			"P":    i * v / 1000,
+			"vMin": vMin / 10,
+			"vMax": vMax / 10,
+		})
+		w.WriteHeader(200)
+		w.Write(data)
+	})
+
 	// Move based on vector (direction+speed)
 	router.POST("/vectormove", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		if r.Body == nil {
