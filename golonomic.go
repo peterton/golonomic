@@ -33,7 +33,7 @@ type moveVector struct {
 	S float64 `json:"s"`
 }
 
-func printPower() {
+func getPower() (float64, float64, float64, float64) {
 	p := ev3dev.PowerSupply("")
 	p = ev3dev.PowerSupply(p.String()) // Cache the driver name if not given.
 
@@ -58,6 +58,7 @@ func printPower() {
 	}
 
 	log.Printf("current power stats: V=%.2fV I=%.0fmA P=%.3fW (designed voltage range:%.2fV-%.2fV)\n", v, i, i*v/1000, vMin/10, vMax/10)
+	return v, i, vMax, vMin
 }
 
 func setupEV3() {
@@ -76,7 +77,7 @@ func setupEV3() {
 	motorB = initMotor("B")
 	motorC = initMotor("C")
 
-	printPower()
+	getPower()
 }
 
 func initMotor(m string) *ev3dev.TachoMotor {
@@ -119,7 +120,7 @@ func vectorMove(v moveVector) {
 		motorB.SetSpeedSetpoint(forceB).Command("run-forever")
 		motorC.SetSpeedSetpoint(forceC).Command("run-forever")
 
-		printPower()
+		getPower()
 	}
 }
 
