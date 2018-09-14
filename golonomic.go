@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math"
 
@@ -13,6 +14,13 @@ const (
 	a1 = 0
 	a2 = 120
 	a3 = 240
+)
+
+var (
+	commit  string
+	builtAt string
+	builtBy string
+	builtOn string
 )
 
 // in order to be able to calculate the forces needed to be applied to each motor
@@ -234,6 +242,10 @@ func beaconTracker(s *irSensor, quit chan bool) {
 }
 
 func main() {
+	fmt.Print("Version info :: ")
+	fmt.Printf("commit: %s ", commit)
+	fmt.Printf("built @ %s by %s on %s\n", builtAt, builtBy, builtOn)
+
 	setupEV3()
 	api()
 }

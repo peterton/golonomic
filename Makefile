@@ -5,10 +5,16 @@ GOTEST=$(GOCMD) test
 BINARY_NAME=golonomic
 EV3_HOST=192.168.221.132
 
+COMMIT=`git rev-parse --short HEAD`
+BUILT_AT=`date +%FT%T%z`
+BUILT_BY=$(USER)
+BUILT_ON=`hostname`
+LDFLAGS="-s -w -X main.commit=$(COMMIT) -X main.builtAt='$(BUILT_AT)' -X main.builtBy=$(BUILT_BY) -X main.builtOn=$(BUILT_ON)"
+
 all: test build
 	
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -ldflags "-s -w" -o $(BINARY_NAME) -v
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -ldflags $(LDFLAGS) -o $(BINARY_NAME) -v
 
 test:
 	$(GOTEST) -v ./...
