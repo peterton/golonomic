@@ -61,26 +61,27 @@ func (s *irSensor) getButton() int {
 	return value
 }
 
-func getPower() (float64, float64, float64, float64) {
+func getPower() (v, i, vMin, vMax float64) {
+	var err error
 	p := ev3dev.PowerSupply("")
 	p = ev3dev.PowerSupply(p.String()) // Cache the driver name if not given.
 
-	v, err := p.Voltage()
+	v, err = p.Voltage()
 	if err != nil {
 		log.Fatalf("could not read voltage: %v", err)
 	}
 
-	i, err := p.Current()
+	i, err = p.Current()
 	if err != nil {
 		log.Fatalf("could not read current: %v", err)
 	}
 
-	vMax, err := p.VoltageMax()
+	vMax, err = p.VoltageMax()
 	if err != nil {
 		log.Fatalf("could not read max design voltage: %v", err)
 	}
 
-	vMin, err := p.VoltageMin()
+	vMin, err = p.VoltageMin()
 	if err != nil {
 		log.Fatalf("could not read min design voltage: %v", err)
 	}
