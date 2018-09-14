@@ -141,7 +141,7 @@ func vectorMove(v moveVector) {
 		motorB.SetSpeedSetpoint(forceB).Command("run-forever")
 		motorC.SetSpeedSetpoint(forceC).Command("run-forever")
 	}
-	getPower()
+	//getPower()
 }
 
 // Converts Polar r distance at degrees angle to x, y Cartesian
@@ -195,7 +195,7 @@ func remoteControl(s *irSensor, quit chan bool) {
 			*/
 			mv := moveVector{}
 			btn := s.getButton()
-			log.Printf("RC mode: button %v pressed", btn)
+			//log.Printf("RC mode: button %v pressed", btn)
 			switch btn {
 			case 1:
 				mv = moveVector{X: 1, Y: 0, S: 0}
