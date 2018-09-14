@@ -210,7 +210,7 @@ func remoteControl(s *irSensor, quit chan bool) {
 			case 8:
 				mv = moveVector{X: 1, Y: -1, S: 0}
 			case 9:
-				return
+				mv = moveVector{X: 0, Y: 0, S: 1}
 			case 10:
 				mv = moveVector{X: -1, Y: -1, S: 0}
 			case 11:
