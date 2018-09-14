@@ -5,12 +5,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 type controlMode struct {
 	Enabled bool `json:"enabled"`
+}
+
+type drivePattern struct {
+	Pattern string `json:"pattern"`
+	// could add things like
 }
 
 func api() {
@@ -102,6 +108,49 @@ func api() {
 		} else {
 			log.Println("stopping beacon tracking mode")
 			quit <- true
+		}
+
+		w.WriteHeader(204)
+	})
+
+	// Drive a pattern
+	router.POST("/pattern", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		if r.Body == nil {
+			w.WriteHeader(400)
+			return
+		}
+		dp := drivePattern{}
+		err := json.NewDecoder(r.Body).Decode(&dp)
+		if err != nil {
+			w.WriteHeader(500)
+			fmt.Println(err)
+			return
+		}
+
+		switch dp.Pattern {
+		case "square":
+			vectorMove(moveVector{X: 1, Y: 0, S: 0})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: 0, Y: 1, S: 0})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: -1, Y: 0, S: 0})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: 0, Y: -1, S: 0})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: 0, Y: 0, S: 0})
+		case "roundedsquare":
+			vectorMove(moveVector{X: 1, Y: 0, S: 1})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: 0, Y: 1, S: 1})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: -1, Y: 0, S: 1})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: 0, Y: -1, S: 1})
+			time.Sleep(2 * time.Second)
+			vectorMove(moveVector{X: 0, Y: 0, S: 0})
+		default:
+			w.WriteHeader(400)
+			return
 		}
 
 		w.WriteHeader(204)
