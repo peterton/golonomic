@@ -105,13 +105,11 @@ func cartesianToPolar(r, degrees float64) (x, y float64) {
 	return x, y
 }
 
-//moves the robot at degrees angle for speed s
-func movePolar(degrees, speed float64) (x, y float64) {
-
-	x, y = cartesianToPolar(1.0, degrees)
+//moves the robot at degrees angle with angular speed s
+func movePolar(degrees, speed float64) {
+	x, y := cartesianToPolar(1.0, degrees)
 	mv := moveVector{X: x, Y: y, S: speed}
 	vectorMove(mv)
-	return x, y
 }
 
 func remoteControl(s *irSensor, quit chan bool) {
@@ -184,10 +182,15 @@ func beaconTracker(s *irSensor, quit chan bool) {
 
 			// distance doesn't really matter, we need heading
 			// ir sensor is placed at 180 degress (x = 0, y = -1)
-			// idea: if no beacon found, rotate? (x = 0, y = 0, s = 1)
-			mv := moveVector{}
-			mv = moveVector{X: 0, Y: 0, S: 0}
-			vectorMove(mv)
+			if distance == -128 {
+				// if no beacon found, rotate (x = 0, y = 0, s = 1)
+				mv := moveVector{X: 0, Y: 0, S: 1}
+				vectorMove(mv)
+			} else {
+				// heading ranges from -25 to 25; what are these values?
+				// 0..+25 is 180..>180 degress, 0..-25 is 180..<180 degrees
+				movePolar(180+float64(heading)*3, 0)
+			}
 		}
 	}
 }
