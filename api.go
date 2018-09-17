@@ -10,8 +10,10 @@ import (
 	"github.com/rs/cors"
 )
 
-type controlMode struct {
-	Enabled bool `json:"enabled"`
+type botMode struct {
+	Enabled bool   `json:"enabled"`
+	IRMode  string `json:"irmode"`
+	BotMode string `json:"botmode"`
 }
 
 type drivePattern struct {
@@ -21,6 +23,7 @@ type drivePattern struct {
 
 func api() {
 	quit := make(chan bool)
+	currentBotMode := botMode{}
 
 	// Home
 	router := httprouter.New()
@@ -75,54 +78,64 @@ func api() {
 		w.WriteHeader(204)
 	})
 
-	// Put bot in RC mode
-	router.POST("/rc", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// enable/stop bot mode ("beacon, remote,pattern")
+	router.POST("/botmode", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
 		if r.Body == nil {
 			w.WriteHeader(400)
 			return
 		}
-		rc := controlMode{}
-		err := json.NewDecoder(r.Body).Decode(&rc)
+
+		bm := botMode{}
+		err := json.NewDecoder(r.Body).Decode(&bm)
 		if err != nil {
 			w.WriteHeader(500)
 			log.Println(err)
 			return
 		}
 
-		s := newIRSensor("IR-REMOTE")
+		s := newIRSensor(bm.IRMode)
 
-		if rc.Enabled {
-			log.Println("starting remote control mode")
-			go remoteControl(s, quit)
+		if currentBotMode.Enabled != true {
+			// no bot currently enabled
+			if bm.Enabled {
+				// request to enable new botMode
+				currentBotMode.Enabled = true
+				currentBotMode.IRMode = bm.IRMode
+				currentBotMode.BotMode = bm.BotMode
+				go remoteControl(s, quit)
+			} else {
+				// request to disable exiting BotMode
+				log.Printf("Attempt to disable, but nothing enabled %s:%s. Ignoring...\n", bm.BotMode, bm.IRMode)
+			}
+		} else if currentBotMode.BotMode == bm.BotMode {
+			// call is for currently enabled botMode
+			if bm.Enabled {
+				// it's already enabled...
+				log.Printf("botMode:IRMode already enabled: %s:%s. Ignoring...\n", bm.BotMode, bm.IRMode)
+			} else {
+				// dislable it
+				currentBotMode.Enabled = false
+				currentBotMode.IRMode = ""
+				currentBotMode.BotMode = ""
+				quit <- true
+			}
 		} else {
-			log.Println("stopping remote control mode")
-			quit <- true
-		}
-
-		w.WriteHeader(204)
-	})
-
-	// Put bot in beacon tracking mode
-	router.POST("/beacon", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		if r.Body == nil {
-			w.WriteHeader(400)
-			return
-		}
-		beacon := controlMode{}
-		err := json.NewDecoder(r.Body).Decode(&beacon)
-		if err != nil {
-			w.WriteHeader(500)
-			log.Println(err)
-			return
-		}
-
-		s := newIRSensor("IR-SEEK")
-		if beacon.Enabled {
-			log.Println("starting beacon tracking mode")
-			go beaconTracker(s, quit)
-		} else {
-			log.Println("stopping beacon tracking mode")
-			quit <- true
+			//there is a bot enabled and request is for different bot
+			if bm.Enabled {
+				// disable current bot and then enable new one
+				currentBotMode.Enabled = false
+				currentBotMode.IRMode = ""
+				currentBotMode.BotMode = ""
+				quit <- true
+				currentBotMode.Enabled = true
+				currentBotMode.IRMode = bm.IRMode
+				currentBotMode.BotMode = bm.BotMode
+				go remoteControl(s, quit)
+			} else {
+				// request to disable for a different BotMode
+				log.Printf("Attempt to disable different botMode (%s:%s) from current (%s:%s).Ignoring...\n", bm.BotMode, bm.IRMode, currentBotMode.BotMode, currentBotMode.IRMode)
+			}
 		}
 
 		w.WriteHeader(204)
