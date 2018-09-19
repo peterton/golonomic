@@ -97,6 +97,7 @@ func api() {
 		} else {
 			log.Println("stopping remote control mode")
 			quit <- true
+			stopMotors()
 		}
 
 		w.WriteHeader(204)
@@ -123,6 +124,7 @@ func api() {
 		} else {
 			log.Println("stopping beacon tracking mode")
 			quit <- true
+			stopMotors()
 		}
 
 		w.WriteHeader(204)
