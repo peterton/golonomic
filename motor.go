@@ -46,6 +46,7 @@ func initMotor(m string) *ev3dev.TachoMotor {
 		return motor
 	}
 	log.Fatalf("specified unknown motor: %s", m)
+	resetMotors()
 	return nil
 }
 
@@ -53,6 +54,12 @@ func stopMotors() {
 	motorA.Command("stop")
 	motorB.Command("stop")
 	motorC.Command("stop")
+}
+
+func resetMotors() {
+	motorA.Command("reset")
+	motorB.Command("reset")
+	motorC.Command("reset")
 }
 
 func vectorMove(v moveVector) {
@@ -107,22 +114,6 @@ func remoteControl(s *irSensor, quit chan bool) {
 			return
 		default:
 			/*
-				[_BACK_]
-				[A]  [C]
-				[B]  [D]
-
-				A    = 1
-				B    = 2
-				C    = 3
-				D    = 4
-				A+C  = 5
-				A+D  = 6
-				B+C  = 7
-				B+D  = 8
-				BACK = 9
-				A+B  = 10
-				C+D  = 11
-
 				hold remote as:
 				  [C]
 				[A] [D]
@@ -132,25 +123,25 @@ func remoteControl(s *irSensor, quit chan bool) {
 			btn := s.getButton()
 			log.Printf("RC mode: button %v pressed", btn)
 			switch btn {
-			case 1:
+			case 1: // A
 				mv = moveVector{X: 1, Y: 0, W: 0}
-			case 2:
+			case 2: // B
 				mv = moveVector{X: 0, Y: -1, W: 0}
-			case 3:
+			case 3: // C
 				mv = moveVector{X: 0, Y: 1, W: 0}
-			case 4:
+			case 4: // D
 				mv = moveVector{X: -1, Y: 0, W: 0}
-			case 5:
+			case 5: // A+C
 				mv = moveVector{X: 1, Y: 1, W: 0}
-			case 8:
+			case 8: // B+D
 				mv = moveVector{X: -1, Y: -1, W: 0}
-			case 9:
+			case 9: // BACK, rotate
 				mv = moveVector{X: 0, Y: 0, W: 1}
-			case 10:
+			case 10: // A+B
 				mv = moveVector{X: 1, Y: -1, W: 0}
-			case 11:
+			case 11: // C+D
 				mv = moveVector{X: -1, Y: 1, W: 0}
-			default:
+			default: // do nothing
 				mv = moveVector{X: 0, Y: 0, W: 0}
 			}
 			vectorMove(mv)
@@ -159,6 +150,7 @@ func remoteControl(s *irSensor, quit chan bool) {
 }
 
 func beaconTracker(s *irSensor, quit chan bool) {
+	lastHeading := 0
 	for {
 		select {
 		case <-quit:
@@ -171,10 +163,15 @@ func beaconTracker(s *irSensor, quit chan bool) {
 
 			// distance doesn't really matter, we need heading
 			// ir sensor is placed at 180 degress (x = 0, y = -1)
-			if distance == -128 {
-				// if no beacon found, rotate (x = 0, y = 0, s = 1)
-				// TODO: save state which side it left, turn that way!
-				mv := moveVector{X: 0, Y: 0, W: .5}
+			if distance == -128 || distance == 100 {
+				// if no beacon found, rotate slowly (x = 0, y = 0, s = 0.5)
+				// turn into the direction we last saw the beacon
+				if lastHeading < 0 {
+					lastHeading = -1
+				} else {
+					lastHeading = 1
+				}
+				mv := moveVector{X: 0, Y: 0, W: .5 * float64(lastHeading)}
 				vectorMove(mv)
 			} else {
 				// heading ranges from -25 to 25; what are these values?
@@ -185,6 +182,7 @@ func beaconTracker(s *irSensor, quit chan bool) {
 				mv := moveVector{X: 0, Y: float64(distance) / -100, W: float64(heading) / -25}
 				vectorMove(mv)
 			}
+			lastHeading = heading
 		}
 	}
 }
